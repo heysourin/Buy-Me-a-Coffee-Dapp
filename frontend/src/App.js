@@ -58,7 +58,7 @@ function App() {
   return (
     <div className="App">
       <Buy state={state}/>
-      <Memos/>
+      <Memos state={state}/>
     </div>
   );
 }
