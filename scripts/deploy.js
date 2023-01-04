@@ -26,23 +26,41 @@ async function consoleMemos(memos) {
   }
 }
 
+const verify = async(contractAddress, args) => {
+  console.log("Verifying contract...");
+  try {
+    await run("verify:verify", {
+      address: contractAddress,
+      constructorArguments: args,
+    });
+  } catch (e) {
+    if (e.message.toLowerCase().includes("already verified")) {
+      console.log("Already Verified!");
+    } else {
+      console.log(e);
+    }
+  }
+};
+
 async function main() {
+  //Generating some address, we will need
   const [owner, from1, from2, from3] = await hre.ethers.getSigners();
 
   const Chai = await hre.ethers.getContractFactory("chai");
-  const contract = await Chai.deploy();
+  const contract = await Chai.deploy();//instance of contract
 
   await contract.deployed();
-  console.log(`Contract deployed at ${contract.address}`);
-
+  console.log(`Contract deployed to: ${contract.address}`);
+ 
   const addresses = [
     owner.address,
     from1.address,
     from2.address,
     from2.address,
   ];
+
   console.log(`Before buying `);
-  await consoleBalances(addresses);
+  await consoleBalances(addresses);//initial balance of accounts
 
   const amount = { value: hre.ethers.utils.parseEther("1") };
   await contract.connect(from1).buyChai("From1", "Very nice chai", amount);
@@ -54,6 +72,11 @@ async function main() {
 
   const memos = await contract.getMemos();
   consoleMemos(memos);
+
+  if (network.config.chainId === 5 && process.env.ETHERSCAN_API_KEY) {
+    await contract.deployTransaction.wait(1);
+    await verify(contract.address, []);
+  }
 }
 
 main().catch((error) => {
