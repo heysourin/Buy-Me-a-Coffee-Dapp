@@ -5,6 +5,7 @@ import { ethers, providers } from "ethers";
 import "./App.css";
 import Buy from "./components/Buy";
 import Memos from "./components/Memos";
+import Header from "./components/Header";
 
 function App() {
   const [state, setState] = useState({
@@ -57,6 +58,8 @@ function App() {
 
   return (
     <div className="App">
+      <Header/>
+      <p>Connected Account: {account}</p>
       <Buy state={state}/>
       <Memos state={state}/>
     </div>
